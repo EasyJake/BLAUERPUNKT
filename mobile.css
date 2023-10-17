@@ -1,0 +1,29 @@
+#mobile-container {
+    width: 375px; /* Width of the mobile device */
+    height: 667px; /* Height of the mobile device */
+    overflow: hidden; /* Avoid overflow of inner content */
+    border: 1px solid #000; /* Representing device boundary */
+    border-radius: 20px; /* Optional: for rounded corners */
+    position: relative; /* Set position relative for the inner absolute positioning */
+    margin: 0 auto; /* Center the device horizontally */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional: for better visualization */
+}
+
+/* Adding a blue circle */
+#mobile-container::before {
+    content: ""; /* An empty content for the pseudo-element */
+    width: 50px; /* Width of the blue circle */
+    height: 50px; /* Height of the blue circle */
+    background-color: blue; /* Color of the circle */
+    border-radius: 50%; /* Makes it a circle */
+    position: absolute; /* Absolute positioning */
+    bottom: 70px; /* Position near the bottom */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust the position to be perfectly centered */
+}
+
+/* Centering the h1 element */
+#mobile-container h1 {
+    text-align: center;
+}
+
