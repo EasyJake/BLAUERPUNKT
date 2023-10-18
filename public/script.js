@@ -1,46 +1,80 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const gameContainer = document.getElementById('gameContainer');
-    const player = document.createElement('div');
-    player.classList.add('player');
-    gameContainer.appendChild(player);
+    const container = document.querySelector('#mobile-container');
+    const circle = document.createElement('div');
 
-    let playerLeft = 375;
-    player.style.left = playerLeft + 'px';
+    circle.style.width = '50px';
+    circle.style.height = '50px';
+    circle.style.backgroundColor = 'blue';
+    circle.style.borderRadius = '50%';
+    circle.style.position = 'absolute';
+    circle.style.bottom = '70px';
+    circle.style.left = '50%';
+    circle.style.transform = 'translateX(-50%)';
+    circle.style.cursor = 'pointer'; 
 
-    function movePlayer(e) {
-        if (e.key === 'ArrowLeft' && playerLeft > 0) {
-            playerLeft -= 15;
-            player.style.left = playerLeft + 'px';
-        }
-        if (e.key === 'ArrowRight' && playerLeft < 750) {
-            playerLeft += 15;
-            player.style.left = playerLeft + 'px';
-        }
-    }
-    document.onkeydown = movePlayer;
+    container.appendChild(circle);
 
-    function createProjectile(e) {
-        if (e.key === ' ') {
+    let isDragging = false;
+    let startDragY = 0;
+    let startCircleBottom = 0;
+    const radius = 25;
+
+    let initialPosition = null;
+    let tension = 0;
+
+    circle.addEventListener('mousedown', function(event) {
+        isDragging = true;
+        startDragY = event.clientY;
+        startCircleBottom = parseFloat(circle.style.bottom);
+        initialPosition = { x: event.clientX, y: event.clientY };
+        event.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(event) {
+        if (!isDragging) return;
+
+        const currentPosition = { x: event.clientX, y: event.clientY };
+        tension = Math.sqrt(Math.pow(currentPosition.x - initialPosition.x, 2) + Math.pow(currentPosition.y - initialPosition.y, 2));
+        
+        let distanceMoved = startDragY - event.clientY;
+        if (distanceMoved > radius) distanceMoved = radius;
+        else if (distanceMoved < -radius) distanceMoved = -radius;
+        
+        circle.style.bottom = (startCircleBottom + distanceMoved) + 'px';
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (!isDragging) return;
+
+        if (tension > radius) { // only shoot if there's proper tension
             const projectile = document.createElement('div');
-            projectile.classList.add('projectile');
-            gameContainer.appendChild(projectile);
+            projectile.style.width = '25px';
+            projectile.style.height = '25px';
+            projectile.style.backgroundColor = 'blue';
+            projectile.style.borderRadius = '50%';
+            projectile.style.position = 'absolute';
+            projectile.style.bottom = (parseFloat(circle.style.bottom) + 25) + 'px';
+            projectile.style.left = '50%';
+            projectile.style.transform = 'translateX(-50%)';
+            container.appendChild(projectile);
 
-            let projectileBottom = 20;
-            let projectileLeft = playerLeft + 20;
-            projectile.style.left = projectileLeft + 'px';
-            projectile.style.bottom = projectileBottom + 'px';
-
-            function moveProjectile() {
-                if (projectileBottom < 580) {
-                    projectileBottom += 5;
-                    projectile.style.bottom = projectileBottom + 'px';
+            requestAnimationFrame(function animate() {
+                const currentBottom = parseFloat(projectile.style.bottom);
+                if (currentBottom < window.innerHeight) {
+                    projectile.style.bottom = (currentBottom + 5) + 'px';
+                    requestAnimationFrame(animate);
                 } else {
-                    clearInterval(projectileTimerId);
-                    gameContainer.removeChild(projectile);
+                    container.removeChild(projectile);
                 }
-            }
-            let projectileTimerId = setInterval(moveProjectile, 30);
+            });
         }
-    }
-    document.onkeypress = createProjectile;
+
+        // Animate main circle back to original position
+        circle.style.transition = 'bottom 0.5s cubic-bezier(.25,.82,.25,1)';
+        circle.style.bottom = '70px';
+        setTimeout(() => circle.style.transition = '', 500);
+
+        isDragging = false;
+        tension = 0;
+    });
 });
