@@ -5,10 +5,10 @@ cd prototypes
 
 # Loop through each .js file in the directory
 for jsfile in *.js; do
-    # Extract the filename without the extension
-    filename=$(basename "$jsfile" .js)
+    # Extract the filename without the extension and remove the "~" at the front
+    filename=$(basename "$jsfile" .js | sed 's/~//')
     
-    # Create the corresponding .html file
+    # Create the corresponding .html file in the prototypes directory
     cat <<EOL > "${filename}.html"
 <!DOCTYPE html>
 <html lang="en">
@@ -27,4 +27,6 @@ for jsfile in *.js; do
 </body>
 </html>
 EOL
+    # Overwrite the file if it already exists
+    mv -f "${filename}.html" "../public/${filename}.html"
 done
