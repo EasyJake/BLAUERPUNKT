@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let isDragging = false;
     let startDragY = 0;
     let startCircleBottom = 0;
+    const radius = 25; // Half of the circle's diameter
 
     circle.addEventListener('mousedown', function(event) {
         isDragging = true;
@@ -27,67 +28,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('mousemove', function(event) {
         if (!isDragging) return;
+
         let distanceMoved = startDragY - event.clientY;
+
+        // Limit the distance to the radius of the circle
+        if (distanceMoved > radius) {
+            distanceMoved = radius;
+        } else if (distanceMoved < -radius) {
+            distanceMoved = -radius;
+        }
+
         circle.style.bottom = (startCircleBottom + distanceMoved) + 'px';
     });
 
     document.addEventListener('mouseup', function() {
         if (!isDragging) return;
         isDragging = false;
-        
-        // Animate back to original position
-        circle.style.transition = 'bottom 0.5s cubic-bezier(.25,.82,.25,1)'; // A 'bounce' easing function
+
+        // Create and animate the projectile
+        const projectile = document.createElement('div');
+        projectile.style.width = '25px';
+        projectile.style.height = '25px';
+        projectile.style.backgroundColor = 'blue';
+        projectile.style.borderRadius = '50%';
+        projectile.style.position = 'absolute';
+        projectile.style.bottom = (parseFloat(circle.style.bottom) + 25) + 'px';
+        projectile.style.left = '50%';
+        projectile.style.transform = 'translateX(-50%)';
+        container.appendChild(projectile);
+
+        requestAnimationFrame(function animate() {
+            const currentBottom = parseFloat(projectile.style.bottom);
+            if (currentBottom < window.innerHeight) {
+                projectile.style.bottom = (currentBottom + 5) + 'px';
+                requestAnimationFrame(animate);
+            } else {
+                container.removeChild(projectile);
+            }
+        });
+
+        // Animate main circle back to original position
+        circle.style.transition = 'bottom 0.5s cubic-bezier(.25,.82,.25,1)';
         circle.style.bottom = '70px';
 
-        // Remove transition once animation is complete to avoid unwanted effects in future drag operations
+        // Remove transition once animation is complete
         setTimeout(() => circle.style.transition = '', 500);
-    });
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('#mobile-container');
-    const circle = document.createElement('div');
-
-    circle.style.width = '50px';
-    circle.style.height = '50px';
-    circle.style.backgroundColor = 'blue';
-    circle.style.borderRadius = '50%';
-    circle.style.position = 'absolute';
-    circle.style.bottom = '70px';
-    circle.style.left = '50%';
-    circle.style.transform = 'translate(-50%, 0)';
-    circle.style.cursor = 'pointer';
-
-    container.appendChild(circle);
-
-    let isDragging = false;
-    let startDragX = 0;
-    let startDragY = 0;
-    let startCircleLeft = 0;
-    let startCircleBottom = 0;
-
-    circle.addEventListener('mousedown', function(event) {
-        isDragging = true;
-        startDragX = event.clientX;
-        startDragY = event.clientY;
-        startCircleLeft = parseFloat(circle.style.left);
-        startCircleBottom = parseFloat(circle.style.bottom);
-        event.preventDefault();
-    });
-
-    document.addEventListener('mousemove', function(event) {
-        if (!isDragging) return;
-        
-        let distanceMovedX = event.clientX - startDragX;
-        let distanceMovedY = startDragY - event.clientY; // Y axis is inverted
-        
-        circle.style.left = (startCircleLeft + distanceMovedX) + 'px';
-        circle.style.bottom = (startCircleBottom + distanceMovedY) + 'px';
-    });
-
-    document.addEventListener('mouseup', function() {
-        isDragging = false;
-        // You can add any additional behavior here if needed
     });
 });
