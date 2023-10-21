@@ -88,6 +88,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+
+
+
+
+
+
+        
+
         requestAnimationFrame(function animateProjectile() {
             const currentBottom = parseFloat(projectile.style.bottom);
             if (currentBottom < window.innerHeight) {

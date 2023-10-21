@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     redSquare.style.backgroundColor = 'red';
     redSquare.style.position = 'absolute';
     redSquare.style.top = '0';
-    redSquare.style.left = '-50px'; // Start off-screen to the left
+    redSquare.style.left = '50%';
     redSquare.style.transform = 'translateX(-50%)';
 
     container.appendChild(circle);
@@ -88,12 +88,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        requestAnimationFrame(function animateProjectile() {
+        requestAnimationFrame(function animate() {
             const currentBottom = parseFloat(projectile.style.bottom);
             if (currentBottom < window.innerHeight) {
                 projectile.style.bottom = (currentBottom + 5) + 'px';
                 checkCollision(); // Check for collision on each frame
-                requestAnimationFrame(animateProjectile);
+                requestAnimationFrame(animate);
             } else {
                 container.removeChild(projectile);
                 projectiles.pop(); // Remove projectile from the array
@@ -106,19 +106,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Remove transition once animation is complete
         setTimeout(() => circle.style.transition = '', 500);
-
-        // Animate the red square from left to right
-        function animateRedSquare() {
-            const currentLeft = parseFloat(redSquare.style.left);
-            if (currentLeft < window.innerWidth) {
-                redSquare.style.left = (currentLeft + 5) + 'px';
-                requestAnimationFrame(animateRedSquare);
-            } else {
-                redSquare.style.left = '-50px'; // Reset to off-screen left
-                setTimeout(() => requestAnimationFrame(animateRedSquare), 1000); // Wait for 1 second before re-entering
-            }
-        }
-
-        requestAnimationFrame(animateRedSquare);
     });
 });
