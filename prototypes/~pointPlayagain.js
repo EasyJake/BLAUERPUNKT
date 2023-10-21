@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const container = document.querySelector('#mobile-container');
     const circle = document.createElement('div');
-    const redSquare = document.createElement('div');
     const projectiles = []; // Store projectiles in an array
 
     circle.style.width = '50px';
@@ -14,16 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     circle.style.transform = 'translateX(-50%)';
     circle.style.cursor = 'pointer'; // Cursor indicates it's draggable
 
-    redSquare.style.width = '50px';
-    redSquare.style.height = '50px';
-    redSquare.style.backgroundColor = 'red';
-    redSquare.style.position = 'absolute';
-    redSquare.style.top = '0';
-    redSquare.style.left = '-50px'; // Start off-screen to the left
-    redSquare.style.transform = 'translateX(-50%)';
-
     container.appendChild(circle);
-    container.appendChild(redSquare);
 
     let isDragging = false;
     let startDragY = 0;
@@ -72,19 +62,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function checkCollision() {
             const circleRect = circle.getBoundingClientRect();
-            const redSquareRect = redSquare.getBoundingClientRect();
             const projectileRect = projectile.getBoundingClientRect();
 
             if (
-                projectileRect.left < redSquareRect.right &&
-                projectileRect.right > redSquareRect.left &&
-                projectileRect.bottom > redSquareRect.top &&
-                projectileRect.top < redSquareRect.bottom
+                projectileRect.left < circleRect.right &&
+                projectileRect.right > circleRect.left &&
+                projectileRect.bottom > circleRect.top &&
+                projectileRect.top < circleRect.bottom
             ) {
-                // Collision detected, remove the projectile and red square
+                // Collision detected, remove the projectile
                 container.removeChild(projectile);
-                container.removeChild(redSquare);
                 projectiles.pop(); // Remove projectile from the array
+                
+                // Create the "POINT" screen
+                const pointScreen = document.createElement('div');
+                pointScreen.style.width = '100%';
+                pointScreen.style.height = '100%';
+                pointScreen.style.backgroundColor = 'blue';
+                pointScreen.style.position = 'absolute';
+                pointScreen.style.top = '0';
+                pointScreen.style.left = '0';
+                pointScreen.style.display = 'flex';
+                pointScreen.style.flexDirection = 'column';
+                pointScreen.style.alignItems = 'center';
+                pointScreen.style.justifyContent = 'center';
+                pointScreen.style.color = 'white';
+                pointScreen.style.fontSize = '2em';
+
+                // Create the "POINT" text
+                const pointText = document.createElement('div');
+                pointText.textContent = 'POINT';
+                pointText.style.marginBottom = '20px';
+
+                // Create the "Play Again" button
+                const playAgainButton = document.createElement('button');
+                playAgainButton.textContent = 'Play Again';
+                playAgainButton.style.padding = '10px 20px';
+                playAgainButton.style.fontSize = '1.5em';
+
+                // Add event listener to restart the game when clicking "Play Again"
+                playAgainButton.addEventListener('click', function() {
+                    container.removeChild(pointScreen);
+                    // Reset the game here (e.g., reset circle position)
+                    circle.style.bottom = '70px';
+                });
+
+                // Append elements to the "POINT" screen
+                pointScreen.appendChild(pointText);
+                pointScreen.appendChild(playAgainButton);
+
+                // Append the "POINT" screen to the container
+                container.appendChild(pointScreen);
             }
         }
 
@@ -106,19 +134,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Remove transition once animation is complete
         setTimeout(() => circle.style.transition = '', 500);
-
-        // Animate the red square from left to right
-        function animateRedSquare() {
-            const currentLeft = parseFloat(redSquare.style.left);
-            if (currentLeft < window.innerWidth) {
-                redSquare.style.left = (currentLeft + 5) + 'px';
-                requestAnimationFrame(animateRedSquare);
-            } else {
-                redSquare.style.left = '-50px'; // Reset to off-screen left
-                setTimeout(() => requestAnimationFrame(animateRedSquare), 1000); // Wait for 1 second before re-entering
-            }
-        }
-
-        requestAnimationFrame(animateRedSquare);
     });
 });
