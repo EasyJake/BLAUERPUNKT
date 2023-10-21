@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const container = document.querySelector('#mobile-container');
     const circle = document.createElement('div');
+    const redSquare = document.createElement('div');
+    const projectiles = []; // Store projectiles in an array
 
     circle.style.width = '50px';
     circle.style.height = '50px';
@@ -12,7 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
     circle.style.transform = 'translateX(-50%)';
     circle.style.cursor = 'pointer'; // Cursor indicates it's draggable
 
+    redSquare.style.width = '50px';
+    redSquare.style.height = '50px';
+    redSquare.style.backgroundColor = 'red';
+    redSquare.style.position = 'absolute';
+    redSquare.style.top = '0';
+    redSquare.style.left = '50%';
+    redSquare.style.transform = 'translateX(-50%)';
+
     container.appendChild(circle);
+    container.appendChild(redSquare);
 
     let isDragging = false;
     let startDragY = 0;
@@ -57,13 +68,33 @@ document.addEventListener('DOMContentLoaded', function() {
         projectile.style.transform = 'translateX(-50%)';
         container.appendChild(projectile);
 
+        projectiles.push(projectile); // Add projectile to the array
+
         requestAnimationFrame(function animate() {
             const currentBottom = parseFloat(projectile.style.bottom);
             if (currentBottom < window.innerHeight) {
                 projectile.style.bottom = (currentBottom + 5) + 'px';
+
+                // Check for collision with the red square
+                const circleRect = circle.getBoundingClientRect();
+                const redSquareRect = redSquare.getBoundingClientRect();
+                const projectileRect = projectile.getBoundingClientRect();
+
+                if (
+                    circleRect.left < redSquareRect.right &&
+                    circleRect.right > redSquareRect.left &&
+                    circleRect.bottom > redSquareRect.top &&
+                    circleRect.top < redSquareRect.bottom
+                ) {
+                    // Collision detected, remove the projectile
+                    container.removeChild(projectile);
+                    projectiles.pop(); // Remove projectile from the array
+                }
+
                 requestAnimationFrame(animate);
             } else {
                 container.removeChild(projectile);
+                projectiles.pop(); // Remove projectile from the array
             }
         });
 
