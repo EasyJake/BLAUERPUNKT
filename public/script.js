@@ -100,10 +100,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         projectileRect.right > redSquareRect.left &&
                         projectileRect.top < redSquareRect.bottom &&
                         projectileRect.bottom > redSquareRect.top) {
+
+                        // Collision detected, remove the involved elements
                         redSquare.remove();
                         redSquares.splice(squareIndex, 1);
                         projectile.remove();
                         projectiles.splice(index, 1);
+
+                        // Show the win screen since a red square was hit
+                        showWinScreen();
                     }
                 });
             });
@@ -128,4 +133,41 @@ document.addEventListener('DOMContentLoaded', function() {
         circle.style.bottom = '70px';
         setTimeout(() => circle.style.transition = '', 500);
     });
+
+    // Function to show the winning screen
+    function showWinScreen() {
+        // Create the overlay
+        const winScreen = document.createElement('div');
+        winScreen.style.position = 'fixed';
+        winScreen.style.top = '0';
+        winScreen.style.left = '0';
+        winScreen.style.width = '100%';
+        winScreen.style.height = '100%';
+        winScreen.style.backgroundColor = 'blue';
+        winScreen.style.display = 'flex';
+        winScreen.style.justifyContent = 'center';
+        winScreen.style.alignItems = 'center';
+        winScreen.style.flexDirection = 'column';
+        winScreen.style.color = 'white';
+        winScreen.style.fontSize = '2em';
+        winScreen.style.zIndex = '1000'; // Ensure the overlay is on top of everything else
+
+        // Create the "YOU WIN" text
+        const winText = document.createElement('div');
+        winText.textContent = 'YOU WIN';
+
+        // Create the "play again" button
+        const playAgainButton = document.createElement('button');
+        playAgainButton.textContent = 'Play Again';
+        playAgainButton.style.marginTop = '20px';
+        playAgainButton.style.fontSize = '1em';
+        playAgainButton.onclick = function() {
+            window.location.reload(); // This will reload the page, resetting the game
+        };
+
+        // Append everything to the overlay
+        winScreen.appendChild(winText);
+        winScreen.appendChild(playAgainButton);
+        document.body.appendChild(winScreen);
+    }
 });
