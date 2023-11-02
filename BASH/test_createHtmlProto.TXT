@@ -52,3 +52,4 @@ for jsfile in prototypes/*.js; do
 done
 
 echo "All tests passed"
+

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Navigate to the prototypes directory
-cd prototypes
-
 # Loop through each .js file in the directory
 for jsfile in *.js; do
     # Extract the filename without the extension and remove the "~" at the front
@@ -27,6 +24,4 @@ for jsfile in *.js; do
 </body>
 </html>
 EOL
-    # Overwrite the file if it already exists
-    mv -f "${filename}.html" "../public/${filename}.html"
 done
