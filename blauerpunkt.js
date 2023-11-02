@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.querySelector('#mobile-container');
     const circle = document.createElement('div');
 
-    // Store red squares and projectiles in arrays
-    const redSquares = [];
+    // Store opponent shapes and projectiles in arrays
+    const opponents = [];
     const projectiles = [];
 
     // Set up the player (blue circle)
@@ -18,55 +18,62 @@ document.addEventListener('DOMContentLoaded', function() {
     circle.style.cursor = 'pointer';
 
     container.appendChild(circle);
-// Create the "tapdot" text element
-const tapDotElement = document.createElement('div');
-tapDotElement.textContent = "TAP THE DOT";
-tapDotElement.style.position = 'absolute';
-tapDotElement.style.bottom = '50px';  // 20 pixels below the circle's bottom
-tapDotElement.style.left = '50%';
-tapDotElement.style.transform = 'translateX(-50%)';
-tapDotElement.style.fontFamily = "system-ui, sans-serif";
 
-container.appendChild(tapDotElement);
+    const tapDotElement = document.createElement('div');
+    tapDotElement.textContent = "TAP THE DOT";
+    tapDotElement.style.position = 'absolute';
+    tapDotElement.style.bottom = '50px';
+    tapDotElement.style.left = '50%';
+    tapDotElement.style.transform = 'translateX(-50%)';
+    tapDotElement.style.fontFamily = "system-ui, sans-serif";
 
-    // Variables for dragging functionality
+    container.appendChild(tapDotElement);
+
     let isDragging = false;
     let startDragY = 0;
     let startCircleBottom = 0;
     const radius = 25;
 
-    // Function to generate and animate red squares
-    function generateRedSquare() {
-        const redSquare = document.createElement('div');
-        redSquare.style.width = '50px';
-        redSquare.style.height = '50px';
-        redSquare.style.backgroundColor = 'red';
-        redSquare.style.position = 'absolute';
-        redSquare.style.top = '0';
-        redSquare.style.left = '-50px';
-        redSquare.style.transform = 'translateX(-50%)';
+    function generateOpponent(yPosition) {
+        const opponent = document.createElement('div');
+        opponent.style.width = '50px';
+        opponent.style.height = '50px';
+        opponent.style.backgroundColor = 'red';
+        opponent.style.position = 'absolute';
+        opponent.style.top = yPosition + 'px';
+        opponent.style.left = '-50px';
 
-        container.appendChild(redSquare);
-        redSquares.push(redSquare);
+        container.appendChild(opponent);
+        opponents.push(opponent);
 
-        // Move the red square from left to right
-        function moveRedSquare() {
-            const currentLeft = parseFloat(redSquare.style.left);
+        const speed = Math.random() * (1999 - 99) + 99;
+
+        function moveOpponent() {
+            const currentLeft = parseFloat(opponent.style.left);
             if (currentLeft < window.innerWidth) {
-                redSquare.style.left = (currentLeft + 5) + 'px';
-                requestAnimationFrame(moveRedSquare);
+                opponent.style.left = (currentLeft + speed / 1000 * 5) + 'px';
+                requestAnimationFrame(moveOpponent);
             } else {
-                redSquare.remove();
-                redSquares.splice(redSquares.indexOf(redSquare), 1);
+                opponent.remove();
+                opponents.splice(opponents.indexOf(opponent), 1);
             }
         }
-        moveRedSquare();
+        moveOpponent();
     }
 
-    // Generate red squares periodically
-    setInterval(generateRedSquare, 2000);
+    function generateOpponentsInRows() {
+        const playerPosition = parseFloat(circle.style.bottom) + parseFloat(circle.style.height);
+        const availableSpace = window.innerHeight - playerPosition;
+        const numberOfRows = 7;
+        const spacingBetweenRows = availableSpace / (numberOfRows + 1); 
 
-    // Event listeners for drag-and-release functionality
+        for (let i = 1; i <= numberOfRows; i++) {
+            setTimeout(() => generateOpponent(playerPosition + spacingBetweenRows * i), Math.random() * 2000);
+        }
+    }
+
+    setInterval(generateOpponentsInRows, 2000);
+
     circle.addEventListener('mousedown', function(event) {
         isDragging = true;
         startDragY = event.clientY;
@@ -85,7 +92,6 @@ container.appendChild(tapDotElement);
         if (!isDragging) return;
         isDragging = false;
 
-        // Create and animate a projectile when the mouse is released
         const projectile = document.createElement('div');
         projectile.style.width = '25px';
         projectile.style.height = '25px';
@@ -99,32 +105,28 @@ container.appendChild(tapDotElement);
         container.appendChild(projectile);
         projectiles.push(projectile);
 
-        // Check for collisions between projectiles and red squares
         function checkCollision() {
             projectiles.forEach((projectile, index) => {
                 const projectileRect = projectile.getBoundingClientRect();
 
-                redSquares.forEach((redSquare, squareIndex) => {
-                    const redSquareRect = redSquare.getBoundingClientRect();
-                    if (projectileRect.left < redSquareRect.right &&
-                        projectileRect.right > redSquareRect.left &&
-                        projectileRect.top < redSquareRect.bottom &&
-                        projectileRect.bottom > redSquareRect.top) {
+                opponents.forEach((opponent, opponentIndex) => {
+                    const opponentRect = opponent.getBoundingClientRect();
+                    if (projectileRect.left < opponentRect.right &&
+                        projectileRect.right > opponentRect.left &&
+                        projectileRect.top < opponentRect.bottom &&
+                        projectileRect.bottom > opponentRect.top) {
 
-                        // Collision detected, remove the involved elements
-                        redSquare.remove();
-                        redSquares.splice(squareIndex, 1);
+                        opponent.remove();
+                        opponents.splice(opponentIndex, 1);
                         projectile.remove();
                         projectiles.splice(index, 1);
 
-                        // Show the win screen since a red square was hit
                         showWinScreen();
                     }
                 });
             });
         }
 
-        // Animate the projectile
         function animateProjectile() {
             const currentBottom = parseFloat(projectile.style.bottom);
             if (currentBottom < window.innerHeight) {
@@ -138,15 +140,12 @@ container.appendChild(tapDotElement);
         }
         requestAnimationFrame(animateProjectile);
 
-        // Reset circle's position
         circle.style.transition = 'bottom 0.5s cubic-bezier(.25,.82,.25,1)';
         circle.style.bottom = '70px';
         setTimeout(() => circle.style.transition = '', 500);
     });
 
-    // Function to show the winning screen
     function showWinScreen() {
-        // Create the overlay
         const winScreen = document.createElement('div');
         winScreen.style.position = 'fixed';
         winScreen.style.top = '0';
@@ -160,22 +159,19 @@ container.appendChild(tapDotElement);
         winScreen.style.flexDirection = 'column';
         winScreen.style.color = 'white';
         winScreen.style.fontSize = '2em';
-        winScreen.style.zIndex = '1000'; // Ensure the overlay is on top of everything else
+        winScreen.style.zIndex = '1000';
 
-        // Create the "YOU WIN" text
         const winText = document.createElement('div');
         winText.textContent = 'YOU WIN';
 
-        // Create the "play again" button
         const playAgainButton = document.createElement('button');
         playAgainButton.textContent = 'Play Again';
         playAgainButton.style.marginTop = '20px';
         playAgainButton.style.fontSize = '1em';
         playAgainButton.onclick = function() {
-            window.location.reload(); // This will reload the page, resetting the game
+            window.location.reload();
         };
 
-        // Append everything to the overlay
         winScreen.appendChild(winText);
         winScreen.appendChild(playAgainButton);
         document.body.appendChild(winScreen);

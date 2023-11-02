@@ -1,6 +1,10 @@
 
 # BLAUERPUNKT
 SDSU MILESTONE PROJECT
+
+https://easyjake.github.io/BLAUERPUNKT/
+
+
 ## Description
 BLAUERPUNKT is an exciting and engaging game that offers players an immersive experience. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.
 
@@ -57,3 +61,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio.
   - **A**: Dolor sit amet.
 
 Enjoy playing BLAUERPUNKT!
+
+
+https://easyjake.github.io/BLAUERPUNKT/
