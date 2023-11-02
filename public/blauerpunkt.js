@@ -18,6 +18,16 @@ document.addEventListener('DOMContentLoaded', function() {
     circle.style.cursor = 'pointer';
 
     container.appendChild(circle);
+// Create the "tapdot" text element
+const tapDotElement = document.createElement('div');
+tapDotElement.textContent = "TAP THE DOT";
+tapDotElement.style.position = 'absolute';
+tapDotElement.style.bottom = '50px';  // 20 pixels below the circle's bottom
+tapDotElement.style.left = '50%';
+tapDotElement.style.transform = 'translateX(-50%)';
+tapDotElement.style.fontFamily = "system-ui, sans-serif";
+
+container.appendChild(tapDotElement);
 
     // Variables for dragging functionality
     let isDragging = false;
