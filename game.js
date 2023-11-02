@@ -44,7 +44,8 @@ function setupStartScreen() {
 function startGame() {
     // Your game's starting logic goes here. For now, it's just a message.
     const gameContainer = document.createElement('div');
-    gameContainer.textContent = 'Game is starting...';
+    gameContainer.textContent = 'Tap Dot';
+gameContainer.style.textAlign = 'center';
     document.body.appendChild(gameContainer);
 
     // Here, you might set up your game elements, initiate game variables, etc.
