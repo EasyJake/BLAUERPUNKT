@@ -1,0 +1,31 @@
+The `fireAngle.js` script is designed to create an interactive projectile-launching simulation within a web page. Here's a summary of its functionality:
+
+1. **DOM Content Loaded Event**: The script waits for the document's content to load before executing.
+
+2. **Setup**:
+   - It selects a container element with the ID `#mobile-container`.
+   - Creates a circular `div` element (referred to as the "circle"), styles it to look like a blue draggable circle, and appends it to the container.
+
+3. **Drag Functionality Variables**:
+   - Initializes variables for drag functionality such as `isDragging`, `startDragX`, `startDragY`, and others to keep track of the circle's position and movement.
+
+4. **Drag Threshold**:
+   - Sets a `radius` that represents half of the circle's diameter, and a `dragThreshold` to determine the minimum distance the mouse must move to trigger a projectile launch.
+
+5. **Mouse Events**:
+   - `mousedown`: Initiates dragging, records the start positions, and prevents default browser behavior.
+   - `mousemove`: Updates the position of the circle based on mouse movement, limiting it to the set radius.
+   - `mouseup`: Calculates the vector for projectile movement if the drag threshold is exceeded, and resets the dragging state.
+
+6. **Projectile Launch**:
+   - On mouse up (if dragging is active and threshold is exceeded), a red `div` representing the projectile is created and positioned at the circle's current location.
+   - Animates the projectile along the calculated vector using `requestAnimationFrame`.
+   - Once the projectile moves outside the window bounds, it is removed from the container.
+
+7. **Circle Reset**:
+   - After launching the projectile, the circle is animated back to its original position at the bottom center of the container.
+
+8. **Cleanup**: 
+   - Transitions applied to the circle are removed once the animation is complete.
+
+Overall, the script enables a user to click and drag a blue circle within a specified container, simulating the launch of a projectile along the drag path. The projectile's motion is animated and once it exits the viewable area, it's removed from the DOM.
