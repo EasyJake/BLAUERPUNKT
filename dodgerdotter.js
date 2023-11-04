@@ -6,8 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const opponents = [];
     const projectiles = [];
 
-    let score = 0;
-
     // Set up the player (blue circle)
     circle.style.width = '50px';
     circle.style.height = '50px';
@@ -22,8 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     container.appendChild(circle);
 
     const tapDotElement = document.createElement('div');
-    tapDotElement.textContent = "TAP"
-    ;
+    tapDotElement.textContent = "TAP THE DOT";
     tapDotElement.style.position = 'absolute';
     tapDotElement.style.bottom = '50px';
     tapDotElement.style.left = '50%';
@@ -36,16 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let startDragY = 0;
     let startCircleBottom = 0;
     const radius = 25;
-    const scoreDisplay = document.createElement('div');
-    scoreDisplay.style.position = 'absolute';
-    scoreDisplay.style.top = '10px';
-    scoreDisplay.style.left = '10px';
-    scoreDisplay.style.fontFamily = "system-ui, sans-serif";
-    scoreDisplay.style.fontSize = '24px';
-    scoreDisplay.style.color = 'white';
-    scoreDisplay.textContent = `Score: ${score}`;
-    container.appendChild(scoreDisplay);
-    
+
     function generateOpponent(yPosition) {
         const opponent = document.createElement('div');
         opponent.style.width = '50px';
@@ -143,13 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentBottom = parseFloat(projectile.style.bottom);
             if (currentBottom < window.innerHeight) {
                 projectile.style.bottom = (currentBottom + 5) + 'px';
-        
-                // Check if the projectile passed the top border
-                if (currentBottom > window.innerHeight - 25) { // 25 is the projectile's height
-                    score++;
-                    scoreDisplay.textContent = `Score: ${score}`;
-                }
-        
                 checkCollision();
                 requestAnimationFrame(animateProjectile);
             } else {
@@ -157,7 +138,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 projectiles.splice(projectiles.indexOf(projectile), 1);
             }
         }
-        
+        requestAnimationFrame(animateProjectile);
+
+        circle.style.transition = 'bottom 0.5s cubic-bezier(.25,.82,.25,1)';
+        circle.style.bottom = '70px';
+        setTimeout(() => circle.style.transition = '', 500);
     });
 
     function showWinScreen() {
@@ -167,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         winScreen.style.left = '0';
         winScreen.style.width = '100%';
         winScreen.style.height = '100%';
-        winScreen.style.backgroundColor = 'red';
+        winScreen.style.backgroundColor = 'blue';
         winScreen.style.display = 'flex';
         winScreen.style.justifyContent = 'center';
         winScreen.style.alignItems = 'center';
@@ -177,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         winScreen.style.zIndex = '1000';
 
         const winText = document.createElement('div');
-        winText.textContent = 'GAME OVER';
+        winText.textContent = 'YOU WIN';
 
         const playAgainButton = document.createElement('button');
         playAgainButton.textContent = 'Play Again';
