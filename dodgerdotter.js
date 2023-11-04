@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     container.appendChild(circle);
 
     const tapDotElement = document.createElement('div');
-    tapDotElement.textContent = "TAP THE DOT";
+    tapDotElement.textContent = "_____________";
     tapDotElement.style.position = 'absolute';
     tapDotElement.style.bottom = '50px';
     tapDotElement.style.left = '50%';
