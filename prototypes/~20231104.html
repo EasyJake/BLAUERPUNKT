@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Score Counter</title>
+    <style>
+        #mobile-container {
+            width: 375px;
+            height: 667px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+            border: 1px solid #000;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            background-color: white;
+            font-family: Arial, sans-serif;
+        }
+        #game-over {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: red;
+            color: white;
+            text-align: center;
+            font-size: 30px;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #play-again {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="mobile-container">
+        <div id="game-over">
+            GAME OVER
+            <div id="play-again">Play Again</div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('mobile-container');
+        const gameWidth = container.offsetWidth;
+        const gameHeight = container.offsetHeight;
+        const inzoneHeight = 150;
+        const bottomPlayerAreaHeight = 120;
+        let opponents = [];
+        let projectiles = [];
+        let score = 0;
+
+        function createBackground(height, color) {
+            const background = document.createElement('div');
+            background.style.width = '100%';
+            background.style.height = `${height}px`;
+            background.style.backgroundColor = color;
+            background.style.position = 'absolute';
+            return background;
+        }
+
+        function createCounter() {
+            const counter = document.createElement('div');
+            counter.innerText = '00000';
+            counter.style.position = 'absolute';
+            counter.style.top = '10px';
+            counter.style.left = '50%';
+            counter.style.transform = 'translate(-50%, 0)';
+            counter.style.color = 'white';
+            counter.style.fontSize = '3em';
+            container.appendChild(counter);
+            return counter;
+        }
+
+        function createPlayer() {
+            const player = document.createElement('div');
+            player.style.width = '50px';
+            player.style.height = '50px';
+            player.style.backgroundColor = 'blue';
+            player.style.borderRadius = '50%';
+            player.style.position = 'absolute';
+            player.style.bottom = '70px';
+            player.style.left = '50%';
+            player.style.transform = 'translate(-50%, 0)';
+            player.style.cursor = 'pointer';
+            container.appendChild(player);
+            return player;
+        }
+
+        function createProjectile(player) {
+            const projectile = document.createElement('div');
+            projectile.style.width = '10px';
+            projectile.style.height = '20px';
+            projectile.style.backgroundColor = 'black';
+            projectile.style.position = 'absolute';
+            projectile.style.left = `${player.offsetLeft + player.offsetWidth / 2}px`;
+            projectile.style.bottom = `${player.offsetTop + player.offsetHeight}px`;
+            container.appendChild(projectile);
+            return projectile;
+        }
+
+        function moveProjectile(projectile) {
+            let moveInterval = setInterval(() => {
+                const newBottom = projectile.offsetTop + 5;
+                if (newBottom >= gameHeight) {
+                    clearInterval(moveInterval);
+                    projectile.remove();
+                    projectiles.splice(projectiles.indexOf(projectile), 1);
+                } else {
+                    projectile.style.bottom = `${newBottom}px`;
+                }
+            }, 20);
+        }
+
+        function createOpponent() {
+            const opponent = document.createElement('div');
+            opponent.style.width = '50px';
+            opponent.style.height = '50px';
+            opponent.style.backgroundColor = 'red';
+            opponent.style.position = 'absolute';
+            opponent.style.top = `${Math.random() * (gameHeight - inzoneHeight - bottomPlayerAreaHeight - 50)}px`;
+            opponent.style.left = '-50px';
+            container.appendChild(opponent);
+            return opponent;
+        }
+
+        function moveOpponent(opponent) {
+            let moveInterval = setInterval(() => {
+                const newLeft = opponent.offsetLeft + 5;
+                if (newLeft >= gameWidth) {
+                    clearInterval(moveInterval);
+                    opponent.remove();
+                    opponents.splice(opponents.indexOf(opponent), 1);
+                } else {
+                    opponent.style.left = `${newLeft}px`;
+                    checkCollision(opponent);
+                }
+            }, 50);
+        }
+
+        function checkCollision(opponent) {
+            for (let projectile of projectiles) {
+                if (projectile.offsetTop < opponent.offsetTop + opponent.offsetHeight &&
+                    projectile.offsetLeft > opponent.offsetLeft &&
+                    projectile.offsetLeft < opponent.offsetLeft + opponent.offsetWidth) {
+                    opponent.remove();
+                    projectile.remove();
+                    opponents.splice(opponents.indexOf(opponent), 1);
+                    projectiles.splice(projectiles.indexOf(projectile), 1);
+                    updateScore();
+                }
+            }
+        }
+
+        function updateScore() {
+            score++;
+            counter.innerText = score.toString().padStart(5, '0');
+        }
+
+        function gameOver() {
+            for (let opponent of opponents) {
+                clearInterval(opponent.moveInterval);
+                opponent.remove();
+            }
+            opponents = [];
+
+            for (let projectile of projectiles) {
+                clearInterval(projectile.moveInterval);
+                projectile.remove();
+            }
+            projectiles = [];
+
+            document.getElementById('game-over').style.display = 'flex';
+        }
+
+        function resetGame() {
+            document.getElementById('game-over').style.display = 'none';
+            score = 0;
+            counter.innerText = '00000';
+        }
+
+        const topBackground = createBackground(inzoneHeight, 'blue');
+        container.appendChild(topBackground);
+
+        const bottomBackground = createBackground(bottomPlayerAreaHeight, 'blue');
+        bottomBackground.style.bottom = '0';
+        container.appendChild(bottomBackground);
+
+        const counter = createCounter();
+
+        const player = createPlayer();
+        player.addEventListener('click', () => {
+            const projectile = createProjectile(player);
+            projectiles.push(projectile);
+            moveProjectile(projectile);
+        });
+
+        setInterval(() => {
+            const opponent = createOpponent();
+            opponents.push(opponent);
+            moveOpponent(opponent);
+        }, 2000);
+
+        document.getElementById('play-again').addEventListener('click', () => {
+            resetGame();
+            window.location.reload(); // Reload the page to restart the game
+        });
+
+        setTimeout(gameOver, 30000); // Ends the game after 30 seconds for this example
+    </script>
+</body>
+</html>
