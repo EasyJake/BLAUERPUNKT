@@ -1,0 +1,44 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('#mobile-container');
+    function generateOpponent(yPosition) {
+        const opponent = document.createElement('div');
+        opponent.style.width = '50px';
+        opponent.style.height = '50px';
+        opponent.style.backgroundColor = 'red';
+        opponent.style.position = 'absolute';
+        opponent.style.top = yPosition + 'px';
+        opponent.style.left = '-50px';
+
+        container.appendChild(opponent);
+        opponents.push(opponent);
+
+        const speed = Math.random() * (1999 - 99) + 99;
+
+        function moveOpponent() {
+            const currentLeft = parseFloat(opponent.style.left);
+            if (currentLeft < window.innerWidth) {
+                opponent.style.left = (currentLeft + speed / 1000 * 5) + 'px';
+                requestAnimationFrame(moveOpponent);
+            } else {
+                opponent.remove();
+                opponents.splice(opponents.indexOf(opponent), 1);
+            }
+        }
+        moveOpponent();
+    }
+
+    function generateOpponentsInRows() {
+        const playerPosition = parseFloat(circle.style.bottom) + parseFloat(circle.style.height);
+        const availableSpace = window.innerHeight - playerPosition;
+        const numberOfRows = 7;
+        const spacingBetweenRows = availableSpace / (numberOfRows + 1); 
+
+        for (let i = 1; i <= numberOfRows; i++) {
+            setTimeout(() => generateOpponent(playerPosition + spacingBetweenRows * i), Math.random() * 2000);
+        }
+    }
+
+    setInterval(generateOpponentsInRows, 2000);
+    
+});
+
