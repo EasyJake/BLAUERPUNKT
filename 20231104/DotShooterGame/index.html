@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Game</title>
+<style>
+  /* Basic reset */
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    user-select: none; /* Prevent selection to improve drag experience */
+  }
+
+  #mobile-container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    background: #000; /* Fallback for where gradient isn't supported */
+    background: linear-gradient(to bottom, #024, #000); /* Simple sky to space gradient */
+  }
+
+  /* Counter style */
+  .counter {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 3em;
+    font-family: Arial, sans-serif;
+    z-index: 10;
+  }
+
+  /* Win screen style */
+  .win-screen {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-size: 2em;
+    z-index: 1000;
+  }
+
+  button {
+    margin-top: 20px;
+    font-size: 1em;
+  }
+  
+  .opponent {
+    width: 30px;
+    height: 30px;
+    background-color: red;
+    position: absolute;
+    top: -30px; /* Start above the screen */
+    border-radius: 50%;
+  }
+</style>
+</head>
+<body>
+<div id="mobile-container">
+  <!-- Counter display -->
+  <div class="counter">00000</div>
+</div>
+<!-- Win Screen -->
+<div class="win-screen">
+  <div>GAME OVER</div>
+  <button onclick="window.location.reload();">Play Again</button>
+</div>
+
+<script>
+// All your JavaScript code
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.querySelector('#mobile-container');
+  const counter = document.querySelector('.counter');
+  const winScreen = document.querySelector('.win-screen');
+
+  let projectileCount = 0;
+  let collisionCount = 0;
+  let isDragging = false;
+  let startDragY;
+  let startCircleBottom;
+
+  // Create player circle
+  const circle = document.createElement('div');
+  styleCircle(circle);
+  container.appendChild(circle);
+
+  // Update counter function
+  function updateCounter() {
+    projectileCount++;
+    counter.textContent = String(projectileCount).padStart(5, '0');
+  }
+
+  // Function to check collision
+  function checkCollision(projectile, index) {
+    const projectileRect = projectile.getBoundingClientRect();
+
+    opponents.forEach((opponent, opponentIndex) => {
+      const opponentRect = opponent.getBoundingClientRect();
+      if (projectileRect.left < opponentRect.right &&
+          projectileRect.right > opponentRect.left &&
+          projectileRect.top < opponentRect.bottom &&
+          projectileRect.bottom > opponentRect.top) {
+
+        opponent.remove();
+        opponents.splice(opponentIndex, 1);
+        projectile.remove();
+        projectiles.splice(index, 1);
+
+        collisionCount++;
+        if (collisionCount >= 3) {
+          winScreen.style.display = 'flex';
+        }
+      }
+    });
+  }
+
+  // Function to animate projectile
+  function animateProjectile(projectile) {
+    const currentBottom = parseFloat(projectile.style.bottom);
+    if (currentBottom < window.innerHeight) {
+      projectile.style.bottom = (currentBottom + 5) + 'px';
+      requestAnimationFrame(() => animateProjectile(projectile));
+    } else {
+      projectile.remove();
+      projectiles.splice(projectiles.indexOf(projectile), 1);
+    }
+  }
+
+  // Projectile firing logic
+  document.addEventListener('mouseup', function() {
+    if (!isDragging) return;
+    isDragging = false;
+    updateCounter();
+
+    const projectile = document.createElement('div');
+    styleProjectile(projectile, circle);
+    container.appendChild(projectile);
+    projectiles.push(projectile);
+
+    requestAnimationFrame(() => animateProjectile(projectile));
+  });
+
+  // Drag logic for player circle
+  circle.addEventListener('mousedown', function(event) {
+    isDragging = true;
+    startDragY = event.clientY;
+    startCircleBottom = parseFloat(circle.style.bottom);
+    event.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(event) {
+    if (!isDragging) return;
+    let distanceMoved = startDragY - event.clientY;
+    circle.style.bottom = Math.max(Math.min(startCircleBottom + distanceMoved, window.innerHeight - circle.offsetHeight), 0) + 'px';
+  });
+
+  // Opponent generation logic
+  setInterval(generateOpponents, 2000);
+
+  function generateOpponents() {
+    const opponent = document.createElement('div');
+    opponent.className = 'opponent';
+    opponent.style.left = Math.floor(Math.random() * (window.innerWidth - 30)) + 'px'; // Random horizontal position
+    container.appendChild(opponent);
+    opponents.push(opponent);
+    animateOpponent(opponent);
+  }
+
+  function animateOpponent(opponent) {
+    let currentTop = parseFloat(opponent.style.top);
+    if (currentTop < window.innerHeight) {
+      opponent.style.top = (currentTop + 3) + 'px';
+      requestAnimationFrame(() => animateOpponent(opponent));
+    } else {
+      opponent.remove();
+      opponents.splice(opponents.indexOf(opponent), 1);
+    }
+  }
+
+  function styleCircle(circle) {
+    circle.style.width = '50px';
+    circle.style.height = '50px';
+    circle.style.backgroundColor = 'blue';
+    circle.style.borderRadius = '50%';
+    circle.style.position = 'absolute';
+    circle.style.bottom = '70px';
+    circle.style.left = '50%';
+    circle.style.transform = 'translateX(-50%)';
+    circle.style.cursor = 'pointer';
+    circle.style.transition = 'bottom 0.5s';
+  }
+
+  function styleProjectile(projectile, circle) {
+    projectile.style.width = '25px';
+    projectile.style.height = '25px';
+    projectile.style.backgroundColor = 'yellow';
+    projectile.style.borderRadius = '50%';
+    projectile.style.position = 'absolute';
+    projectile.style.bottom = circle.getBoundingClientRect().bottom + 'px';
+    projectile.style.left = (circle.getBoundingClientRect().left + circle.offsetWidth / 2 - 12.5) + 'px';
+  }
+
+  // Projectile and opponents list
+  let projectiles = [];
+  let opponents = [];
+
+  // Check for collisions
+  setInterval(() => {
+    projectiles.forEach(checkCollision);
+  }, 100);
+});
+</script>
+</body>
+</html>
