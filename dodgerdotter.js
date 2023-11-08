@@ -53,16 +53,37 @@ document.addEventListener('DOMContentLoaded', function() {
         moveOpponent();
     }
 
-    function generateOpponentsInRows() {
-        const playerPosition = parseFloat(circle.style.bottom) + parseFloat(circle.style.height);
-        const availableSpace = window.innerHeight - playerPosition;
+    function generateOpponentsInRows(bottomLimit, topLimit) {
+        // Get the height of the window to determine the drawing space
+        const windowHeight = window.innerHeight;
+        // Set the number of rows you want to populate with opponents
         const numberOfRows = 7;
-        const spacingBetweenRows = availableSpace / (numberOfRows + 1); 
-
+        
+        // Calculate the available space by taking into account the top and bottom limits
+        const availableSpace = windowHeight - (bottomLimit + topLimit);
+        // Determine the space between rows by dividing the available space by the number of rows plus one
+        const spacingBetweenRows = availableSpace / (numberOfRows + 1);
+        
+        // Loop through the number of rows to place opponents on each
         for (let i = 1; i <= numberOfRows; i++) {
-            setTimeout(() => generateOpponent(playerPosition + spacingBetweenRows * i), Math.random() * 2000);
+            // Calculate the Y position for each opponent, 
+            // starting from the bottom limit and moving up by the spacing between rows
+            const opponentPosition = bottomLimit + spacingBetweenRows * i;
+            // Create a timeout to generate each opponent at random intervals
+            // The opponent is generated at the calculated Y position
+            setTimeout(() => generateOpponent(opponentPosition), Math.random() * 2000);
         }
     }
+    
+    // Example usage of the function with the bottom and top limits:
+    // The bottomLimit is the space from the bottom of the screen where opponents will start appearing
+    // The topLimit is the space from the top of the screen where the last row of opponents will be placed
+    let bottomLimit = -999; // 100 pixels from the bottom of the screen
+    let topLimit = 1;    // 50 pixels from the top of the screen
+    
+    // Call the function with the defined limits
+    generateOpponentsInRows(bottomLimit, topLimit);
+    
 
     setInterval(generateOpponentsInRows, 2000);
 

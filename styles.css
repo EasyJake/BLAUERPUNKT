@@ -1,3 +1,9 @@
+#main-container {
+    width: 100%; /* Full width of the screen or a fixed width */
+    height: 100%; /* Full height of the screen or a fixed height */
+    position: relative; /* If needed for positioning child elements */
+}
+
 #mobile-container {
     width: 375px; /* Width of the mobile device */
     height: 667px; /* Height of the mobile device */
@@ -9,3 +15,10 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional: for better visualization */
 }
 
+
+#playable-area {
+    width: 800px; /* Width of the playable area */
+    height: 600px; /* Height of the playable area */
+    margin: 0 auto; /* Center the playable area horizontally */
+    position: relative; /* Contain all the game elements within this area */
+}
